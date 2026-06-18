@@ -52,9 +52,48 @@
       .card { box-shadow:none; border:0; }
     }
     @media (max-width:600px){ header h1{font-size:18px;} nav{top:48px;} th,td{font-size:12px;padding:8px;} }
+  
+    /* Login koruması */
+    body.locked header,
+    body.locked nav,
+    body.locked .cloudbar,
+    body.locked main { display:none!important; }
+    #loginScreen {
+      position:fixed; inset:0; z-index:99999;
+      background:linear-gradient(135deg,#111827,#1e3a8a);
+      display:none; align-items:center; justify-content:center;
+      padding:20px;
+    }
+    body.locked #loginScreen { display:flex; }
+    .login-card {
+      width:100%; max-width:390px; background:white; border-radius:18px;
+      padding:24px; box-shadow:0 20px 60px rgba(0,0,0,.25);
+    }
+    .login-card h2 { margin:0 0 6px; }
+    .login-card p { color:#6b7280; margin:0 0 16px; font-size:14px; }
+    .login-card input { margin-bottom:10px; }
+    .login-error { color:#dc2626; font-size:13px; min-height:18px; margin-top:8px; }
+    .logout-btn {
+      margin-left:auto; background:#dc2626!important; color:white!important;
+    }
+
   </style>
 </head>
-<body>
+<body class="locked">
+
+<div id="loginScreen">
+  <div class="login-card">
+    <h2>🔐 Eleman Takip Sistemi</h2>
+    <p>Devam etmek için kullanıcı adı ve şifre gir.</p>
+    <label>Kullanıcı adı</label>
+    <input id="loginUser" autocomplete="username" placeholder="admin">
+    <label>Şifre</label>
+    <input id="loginPass" type="password" autocomplete="current-password" placeholder="Şifre">
+    <button class="btn primary" type="button" onclick="doLogin()" style="width:100%;margin-top:6px;">Giriş Yap</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
 <header><h1>Eleman Takip Sistemi FINAL - Tüm Durumlarda Komisyon</h1><div class="small">CV, eleman, tedarikçi, işyeri, firma, ödeme, komisyon, ceza, aylık rapor ve Excel sistemi.</div></header>
 <nav>
   <button class="tab active" data-tab="dashboard">Ana Sayfa</button>
@@ -74,6 +113,7 @@
   <b>Bulut Durumu:</b> <span id="cloudStatus">Bağlanıyor...</span>
   <button type="button" onclick="forceCloudSave()">Buluta Kaydet</button>
   <button type="button" class="mutedbtn" onclick="forceCloudLoad()">Buluttan Yenile</button>
+  <button type="button" class="logout-btn" onclick="logout()">Çıkış</button>
 </div>
 
 <main>
@@ -641,7 +681,54 @@ function printApplicantCV(idv){
   <h1>PERSONEL CV</h1><div class="photos">${img1}</div><table>
   <tr><td>Ad Soyad</td><td>${esc(a.name)}</td></tr><tr><td>Telefon</td><td>${esc(a.phone)}</td></tr><tr><td>Uyruk</td><td>${esc(a.nationality)}</td></tr><tr><td>Doğum Tarihi</td><td>${esc(a.birthDate)}</td></tr><tr><td>Cinsiyet</td><td>${esc(a.gender)}</td></tr><tr><td>Anne Adı</td><td>${esc(a.mother)}</td></tr><tr><td>Baba Adı</td><td>${esc(a.father)}</td></tr><tr><td>Pasaport No</td><td>${esc(a.passport)}</td></tr><tr><td>Mezuniyet</td><td>${esc(a.education)}</td></tr><tr><td>Çalışmak İstediği Yer/Görev</td><td>${esc(a.desiredJob)}</td></tr><tr><td>Boy / Kilo</td><td>${esc(a.height)} / ${esc(a.weight)}</td></tr><tr><td>İş Deneyimi</td><td>${esc(a.experience)}</td></tr><tr><td>Dil Bilgileri</td><td>${esc(a.languages)}</td></tr><tr><td>Not</td><td>${esc(a.note)}</td></tr></table>
   ${a.fullPhoto?`<div class="page"><h1>BOYDAN FOTOĞRAF</h1><img src="${a.fullPhoto.data}" class="big-photo"><h2>${esc(a.name)}</h2><p>Boy: ${esc(a.height)} | Kilo: ${esc(a.weight)} | Görev: ${esc(a.desiredJob)}</p></div>`:""}
-  ${extraPages}</body></html>`);
+  ${extraPages}
+<script>
+(function(){
+  const AUTH_USER = "admin";
+  const AUTH_PASS = "VeliJa150791";
+
+  window.doLogin = function(){
+    const u = (document.getElementById("loginUser")||{}).value || "";
+    const p = (document.getElementById("loginPass")||{}).value || "";
+    const err = document.getElementById("loginError");
+
+    if(u.trim() === AUTH_USER && p === AUTH_PASS){
+      sessionStorage.setItem("eleman_login_ok","1");
+      document.body.classList.remove("locked");
+      if(err) err.textContent = "";
+      setTimeout(function(){ 
+        try { if(typeof renderAll === "function") renderAll(); } catch(e) {}
+      }, 100);
+    } else {
+      if(err) err.textContent = "Kullanıcı adı veya şifre yanlış.";
+    }
+  };
+
+  window.logout = function(){
+    sessionStorage.removeItem("eleman_login_ok");
+    document.body.classList.add("locked");
+    const p = document.getElementById("loginPass");
+    if(p) p.value = "";
+  };
+
+  document.addEventListener("DOMContentLoaded", function(){
+    if(sessionStorage.getItem("eleman_login_ok")==="1"){
+      document.body.classList.remove("locked");
+    } else {
+      document.body.classList.add("locked");
+    }
+    const pass = document.getElementById("loginPass");
+    const user = document.getElementById("loginUser");
+    [pass,user].forEach(function(el){
+      if(el) el.addEventListener("keydown", function(e){
+        if(e.key==="Enter") doLogin();
+      });
+    });
+  });
+})();
+</script>
+
+</body></html>`);
   w.document.close();
 }
 function editWorker(idv){
