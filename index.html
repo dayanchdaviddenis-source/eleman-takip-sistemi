@@ -933,6 +933,22 @@ function exportSupplierDebts(){ saveWorkbook([["Tedarikci Borc Detay", tableToSh
 prepareSupplierSection();
 
 initCloudSync();
+function doLogin(){
+  var u = document.getElementById("loginUser").value;
+  var p = document.getElementById("loginPass").value;
+
+  if(u === "admin" && p === "VeliJa150791"){
+    document.getElementById("loginScreen").style.display="none";
+    document.getElementById("app").style.display="block";
+  }else{
+    alert("Şifre yanlış");
+  }
+}
+
+window.onload=function(){
+  document.getElementById("app").style.display="none";
+}
+      
 </script>
 
 
