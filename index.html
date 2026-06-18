@@ -932,24 +932,30 @@ function prepareSupplierSection(){
 function exportSupplierDebts(){ saveWorkbook([["Tedarikci Borc Detay", tableToSheet("suppliersTable")]], "tedarikci_borc_detay.xlsx"); }
 prepareSupplierSection();
 
-initCloudSync();
-function doLogin(){
+initCloudSync();    
+</script>
+</script>
+window.doLogin = function(){
   var u = document.getElementById("loginUser").value;
   var p = document.getElementById("loginPass").value;
 
   if(u === "admin" && p === "VeliJa150791"){
-    document.getElementById("loginScreen").style.display="none";
-    document.getElementById("app").style.display="block";
-  }else{
-    alert("Şifre yanlış");
+    sessionStorage.setItem("eleman_login_ok","1");
+    document.body.classList.remove("locked");
+  } else {
+    document.getElementById("loginError").innerText = "Kullanıcı adı veya şifre yanlış";
   }
-}
+};
 
-window.onload=function(){
-  document.getElementById("app").style.display="none";
+window.logout = function(){
+  sessionStorage.removeItem("eleman_login_ok");
+  document.body.classList.add("locked");
+};
+
+if(sessionStorage.getItem("eleman_login_ok") === "1"){
+  document.body.classList.remove("locked");
 }
-      
 </script>
 
-
-</body></html>
+</body>
+</html>
