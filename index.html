@@ -52,57 +52,9 @@
       .card { box-shadow:none; border:0; }
     }
     @media (max-width:600px){ header h1{font-size:18px;} nav{top:48px;} th,td{font-size:12px;padding:8px;} }
-  
-    /* Jahan sifre ekrani */
-    #jahanLoginScreen {
-      position: fixed;
-      inset: 0;
-      z-index: 999999;
-      background: linear-gradient(135deg,#111827,#1e3a8a);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    #jahanLoginScreen.jahan-hidden { display: none !important; }
-    .jahan-login-card {
-      width: 100%;
-      max-width: 390px;
-      background: #fff;
-      border-radius: 18px;
-      padding: 24px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.30);
-    }
-    .jahan-login-card h2 { margin: 0 0 6px; font-size: 22px; }
-    .jahan-login-card p { color: #6b7280; margin: 0 0 16px; font-size: 14px; }
-    .jahan-login-card input { margin-bottom: 10px; }
-    .jahan-login-error { color: #dc2626; font-size: 13px; min-height: 18px; margin-top: 8px; }
-    #jahanLogoutBtn {
-      margin-left: auto;
-      background: #dc2626;
-      color: white;
-    }
-
   </style>
 </head>
 <body>
-
-<div id="jahanLoginScreen">
-  <div class="jahan-login-card">
-    <h2>🔐 Eleman Takip Sistemi</h2>
-    <p>Devam etmek için kullanıcı adı ve şifre gir.</p>
-
-    <label>Kullanıcı adı</label>
-    <input id="jahanLoginUser" autocomplete="username" placeholder="Jahan">
-
-    <label>Şifre</label>
-    <input id="jahanLoginPass" type="password" autocomplete="current-password" placeholder="740037">
-
-    <button id="jahanLoginBtn" class="btn primary" type="button" style="width:100%;margin-top:6px;">Giriş Yap</button>
-    <div class="jahan-login-error" id="jahanLoginError"></div>
-  </div>
-</div>
-
 <header><h1>Eleman Takip Sistemi FINAL - Tüm Durumlarda Komisyon</h1><div class="small">CV, eleman, tedarikçi, işyeri, firma, ödeme, komisyon, ceza, aylık rapor ve Excel sistemi.</div></header>
 <nav>
   <button class="tab active" data-tab="dashboard">Ana Sayfa</button>
@@ -122,7 +74,6 @@
   <b>Bulut Durumu:</b> <span id="cloudStatus">Bağlanıyor...</span>
   <button type="button" onclick="forceCloudSave()">Buluta Kaydet</button>
   <button type="button" class="mutedbtn" onclick="forceCloudLoad()">Buluttan Yenile</button>
-  <button type="button" id="jahanLogoutBtn">Çıkış</button>
 </div>
 
 <main>
@@ -690,69 +641,7 @@ function printApplicantCV(idv){
   <h1>PERSONEL CV</h1><div class="photos">${img1}</div><table>
   <tr><td>Ad Soyad</td><td>${esc(a.name)}</td></tr><tr><td>Telefon</td><td>${esc(a.phone)}</td></tr><tr><td>Uyruk</td><td>${esc(a.nationality)}</td></tr><tr><td>Doğum Tarihi</td><td>${esc(a.birthDate)}</td></tr><tr><td>Cinsiyet</td><td>${esc(a.gender)}</td></tr><tr><td>Anne Adı</td><td>${esc(a.mother)}</td></tr><tr><td>Baba Adı</td><td>${esc(a.father)}</td></tr><tr><td>Pasaport No</td><td>${esc(a.passport)}</td></tr><tr><td>Mezuniyet</td><td>${esc(a.education)}</td></tr><tr><td>Çalışmak İstediği Yer/Görev</td><td>${esc(a.desiredJob)}</td></tr><tr><td>Boy / Kilo</td><td>${esc(a.height)} / ${esc(a.weight)}</td></tr><tr><td>İş Deneyimi</td><td>${esc(a.experience)}</td></tr><tr><td>Dil Bilgileri</td><td>${esc(a.languages)}</td></tr><tr><td>Not</td><td>${esc(a.note)}</td></tr></table>
   ${a.fullPhoto?`<div class="page"><h1>BOYDAN FOTOĞRAF</h1><img src="${a.fullPhoto.data}" class="big-photo"><h2>${esc(a.name)}</h2><p>Boy: ${esc(a.height)} | Kilo: ${esc(a.weight)} | Görev: ${esc(a.desiredJob)}</p></div>`:""}
-  ${extraPages}
-<script id="jahanLoginScript">
-(function(){
-  var USER = "Jahan";
-  var PASS = "740037";
-  var KEY = "jahan_login_ok";
-
-  function showApp(){
-    var screen = document.getElementById("jahanLoginScreen");
-    if(screen) screen.classList.add("jahan-hidden");
-  }
-
-  function hideApp(){
-    var screen = document.getElementById("jahanLoginScreen");
-    if(screen) screen.classList.remove("jahan-hidden");
-  }
-
-  function login(){
-    var u = document.getElementById("jahanLoginUser");
-    var p = document.getElementById("jahanLoginPass");
-    var err = document.getElementById("jahanLoginError");
-
-    if(u && p && u.value.trim() === USER && p.value === PASS){
-      sessionStorage.setItem(KEY, "1");
-      showApp();
-      if(err) err.textContent = "";
-      try { if(typeof renderAll === "function") renderAll(); } catch(e) {}
-    } else {
-      if(err) err.textContent = "Kullanıcı adı veya şifre yanlış.";
-    }
-  }
-
-  function logout(){
-    sessionStorage.removeItem(KEY);
-    var p = document.getElementById("jahanLoginPass");
-    if(p) p.value = "";
-    hideApp();
-  }
-
-  document.addEventListener("DOMContentLoaded", function(){
-    var loginBtn = document.getElementById("jahanLoginBtn");
-    var logoutBtn = document.getElementById("jahanLogoutBtn");
-    var userInput = document.getElementById("jahanLoginUser");
-    var passInput = document.getElementById("jahanLoginPass");
-
-    if(sessionStorage.getItem(KEY) === "1") showApp();
-    else hideApp();
-
-    if(loginBtn) loginBtn.addEventListener("click", login);
-    if(logoutBtn) logoutBtn.addEventListener("click", logout);
-
-    [userInput, passInput].forEach(function(el){
-      if(el){
-        el.addEventListener("keydown", function(e){
-          if(e.key === "Enter") login();
-        });
-      }
-    });
-  });
-})();
-</script>
-
-</body></html>`);
+  ${extraPages}</body></html>`);
   w.document.close();
 }
 function editWorker(idv){
