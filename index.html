@@ -934,28 +934,6 @@ prepareSupplierSection();
 
 initCloudSync();    
 </script>
-<script>
-window.doLogin = function(){
-  var u = document.getElementById("loginUser").value;
-  var p = document.getElementById("loginPass").value;
-
-  if(u === "admin" && p === "VeliJa150791"){
-    sessionStorage.setItem("eleman_login_ok","1");
-    document.body.classList.remove("locked");
-  } else {
-    document.getElementById("loginError").innerText = "Kullanıcı adı veya şifre yanlış";
-  }
-};
-
-window.logout = function(){
-  sessionStorage.removeItem("eleman_login_ok");
-  document.body.classList.add("locked");
-};
-
-if(sessionStorage.getItem("eleman_login_ok") === "1"){
-  document.body.classList.remove("locked");
-}
-</script>
 
 </body>
 </html>
