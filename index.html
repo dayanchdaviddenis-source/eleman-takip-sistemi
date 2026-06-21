@@ -55,26 +55,52 @@
   </style>
 
 <style>
-#lockScreen{position:fixed;inset:0;background:rgba(17,24,39,.96);display:flex;align-items:center;justify-content:center;z-index:99999}
-#lockCard{background:#fff;padding:24px;border-radius:16px;max-width:360px;width:92%;box-shadow:0 10px 30px rgba(0,0,0,.25);text-align:center}
-#lockCard h2{margin:0 0 10px}
-#lockCard p{margin:0 0 14px;color:#6b7280}
-#lockCard input{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:10px;margin-bottom:10px;font-size:16px}
-#lockError{color:#dc2626;font-size:13px;min-height:18px}
+#etsLockScreen{position:fixed;inset:0;background:rgba(17,24,39,.97);display:flex;align-items:center;justify-content:center;z-index:2147483647;font-family:Arial,sans-serif}
+#etsLockCard{background:#fff;color:#111827;padding:24px;border-radius:16px;max-width:360px;width:92%;box-shadow:0 10px 30px rgba(0,0,0,.35);text-align:center}
+#etsLockCard h2{margin:0 0 10px;font-size:22px}
+#etsLockCard p{margin:0 0 14px;color:#6b7280;font-size:14px}
+#etsPasswordInput{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:10px;margin-bottom:10px;font-size:16px}
+#etsLockError{color:#dc2626;font-size:13px;min-height:18px;margin-bottom:8px}
+#etsLoginBtn{border:0;background:#2563eb;color:#fff;padding:10px 16px;border-radius:10px;cursor:pointer;width:100%;font-size:15px}
+.etsLocked > header,.etsLocked > nav,.etsLocked > .cloudbar,.etsLocked > main{filter:blur(2px);pointer-events:none;user-select:none}
 </style>
-
 </head>
 <body>
-
-<div id="lockScreen">
-  <div id="lockCard">
+<div id="etsLockScreen">
+  <div id="etsLockCard">
     <h2>Şifre Girişi</h2>
-    <p>Devam etmek için şifreyi girin</p>
-    <input id="appPassword" type="password" placeholder="Şifre">
-    <div id="lockError"></div>
-    <button class="btn primary" onclick="checkAppPassword()">Giriş Yap</button>
+    <p>Programa girmek için şifreyi yazın.</p>
+    <input id="etsPasswordInput" type="password" placeholder="Şifre" autocomplete="off" autofocus>
+    <div id="etsLockError"></div>
+    <button id="etsLoginBtn" type="button">Giriş Yap</button>
   </div>
 </div>
+<script>
+(function(){
+  var DOGRU_SIFRE = "740037";
+  function ac(){
+    try{ sessionStorage.setItem("eleman_takip_giris", "ok"); }catch(e){}
+    document.body.classList.remove("etsLocked");
+    var ekran = document.getElementById("etsLockScreen");
+    if(ekran) ekran.style.display = "none";
+  }
+  function kontrol(){
+    var input = document.getElementById("etsPasswordInput");
+    var hata = document.getElementById("etsLockError");
+    var deger = input ? input.value.trim() : "";
+    if(deger === DOGRU_SIFRE){ ac(); }
+    else{ if(hata) hata.textContent = "Şifre yanlış"; if(input){ input.value=""; input.focus(); } }
+  }
+  document.body.classList.add("etsLocked");
+  try{ if(sessionStorage.getItem("eleman_takip_giris") === "ok"){ ac(); } }catch(e){}
+  document.addEventListener("DOMContentLoaded", function(){
+    var btn = document.getElementById("etsLoginBtn");
+    var input = document.getElementById("etsPasswordInput");
+    if(btn) btn.addEventListener("click", kontrol);
+    if(input){ input.addEventListener("keydown", function(e){ if(e.key === "Enter") kontrol(); }); input.focus(); }
+  });
+})();
+</script>
 
 <header><h1>Eleman Takip Sistemi FINAL - Tüm Durumlarda Komisyon</h1><div class="small">CV, eleman, tedarikçi, işyeri, firma, ödeme, komisyon, ceza, aylık rapor ve Excel sistemi.</div></header>
 <nav>
@@ -662,24 +688,7 @@ function printApplicantCV(idv){
   <h1>PERSONEL CV</h1><div class="photos">${img1}</div><table>
   <tr><td>Ad Soyad</td><td>${esc(a.name)}</td></tr><tr><td>Telefon</td><td>${esc(a.phone)}</td></tr><tr><td>Uyruk</td><td>${esc(a.nationality)}</td></tr><tr><td>Doğum Tarihi</td><td>${esc(a.birthDate)}</td></tr><tr><td>Cinsiyet</td><td>${esc(a.gender)}</td></tr><tr><td>Anne Adı</td><td>${esc(a.mother)}</td></tr><tr><td>Baba Adı</td><td>${esc(a.father)}</td></tr><tr><td>Pasaport No</td><td>${esc(a.passport)}</td></tr><tr><td>Mezuniyet</td><td>${esc(a.education)}</td></tr><tr><td>Çalışmak İstediği Yer/Görev</td><td>${esc(a.desiredJob)}</td></tr><tr><td>Boy / Kilo</td><td>${esc(a.height)} / ${esc(a.weight)}</td></tr><tr><td>İş Deneyimi</td><td>${esc(a.experience)}</td></tr><tr><td>Dil Bilgileri</td><td>${esc(a.languages)}</td></tr><tr><td>Not</td><td>${esc(a.note)}</td></tr></table>
   ${a.fullPhoto?`<div class="page"><h1>BOYDAN FOTOĞRAF</h1><img src="${a.fullPhoto.data}" class="big-photo"><h2>${esc(a.name)}</h2><p>Boy: ${esc(a.height)} | Kilo: ${esc(a.weight)} | Görev: ${esc(a.desiredJob)}</p></div>`:""}
-  ${extraPages}
-<script>
-const APP_PASSWORD = "740037";
-function unlockApp(){ sessionStorage.setItem("ets_unlocked","1"); const el=document.getElementById("lockScreen"); if(el) el.style.display="none"; }
-function checkAppPassword(){
-  const val=(document.getElementById("appPassword")||{}).value||"";
-  const err=document.getElementById("lockError");
-  if(val===APP_PASSWORD){ unlockApp(); }
-  else { if(err) err.textContent="Şifre yanlış"; }
-}
-document.addEventListener("DOMContentLoaded", function(){
-  if(sessionStorage.getItem("ets_unlocked")==="1"){ unlockApp(); }
-  const inp=document.getElementById("appPassword");
-  if(inp){ inp.addEventListener("keydown", function(e){ if(e.key==="Enter") checkAppPassword(); }); }
-});
-</script>
-
-</body></html>`);
+  ${extraPages}</body></html>`);
   w.document.close();
 }
 function editWorker(idv){
